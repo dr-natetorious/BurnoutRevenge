@@ -4,6 +4,9 @@
 #include "WheeledVehiclePawn.h"
 #include "BurnoutCar.generated.h"
 
+class UCrashCameraComponent;
+class UNearMissComponent;
+
 UCLASS()
 class BURNOUTREVENGE_API ABurnoutCar : public AWheeledVehiclePawn
 {
@@ -14,6 +17,14 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp,
+		bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UCrashCameraComponent* CrashCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UNearMissComponent* NearMiss;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boost")
 	float BoostForce = 120000.f;

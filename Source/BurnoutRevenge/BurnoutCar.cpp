@@ -1,10 +1,16 @@
 #include "BurnoutCar.h"
+#include "CrashCameraComponent.h"
+#include "NearMissComponent.h"
 #include "ChaosVehicleMovementComponent.h"
 #include "Components/InputComponent.h"
 
 ABurnoutCar::ABurnoutCar()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	CrashCamera = CreateDefaultSubobject<UCrashCameraComponent>(TEXT("CrashCamera"));
+	NearMiss = CreateDefaultSubobject<UNearMissComponent>(TEXT("NearMiss"));
+	NearMiss->SetupAttachment(GetRootComponent());
 }
 
 void ABurnoutCar::BeginPlay()
@@ -19,17 +25,18 @@ void ABurnoutCar::Tick(float DeltaTime)
 
 	if (bIsBoosting && BoostCharge > 0.f)
 	{
-		if (UChaosVehicleMovementComponent* VM = GetVehicleMovementComponent())
-		{
-			FVector BoostDir = GetActorForwardVector();
-			GetMesh()->AddForce(BoostDir * BoostForce, NAME_None, true);
-		}
-
+		GetMesh()->AddForce(GetActorForwardVector() * BoostForce, NAME_None, true);
 		BoostCharge = FMath::Max(0.f, BoostCharge - BoostDrainRate * DeltaTime);
-
 		if (BoostCharge <= 0.f)
 			bIsBoosting = false;
 	}
+}
+
+void ABurnoutCar::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp,
+	bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+{
+	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+	CrashCamera->TriggerCrash(NormalImpulse);
 }
 
 void ABurnoutCar::SetupPlayerInputComponent(UInputComponent* InputComponent)
