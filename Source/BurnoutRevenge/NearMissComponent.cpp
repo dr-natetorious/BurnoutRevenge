@@ -4,7 +4,7 @@
 
 UNearMissComponent::UNearMissComponent()
 {
-	SetBoxExtent(FVector(300.f, 200.f, 100.f));
+	InitBoxExtent(FVector(300.f, 200.f, 100.f));
 	SetCollisionProfileName(TEXT("OverlapAll"));
 	SetGenerateOverlapEvents(true);
 }
