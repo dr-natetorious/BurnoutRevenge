@@ -6,6 +6,7 @@
 
 class UCrashCameraComponent;
 class UNearMissComponent;
+class UAudioComponent;
 
 UCLASS()
 class BURNOUTREVENGE_API ABurnoutCar : public AWheeledVehiclePawn
@@ -25,6 +26,18 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UNearMissComponent* NearMiss;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UAudioComponent* EngineAudio;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UAudioComponent* BoostAudio;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	float EnginePitchMin = 0.6f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	float EnginePitchMax = 1.8f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boost")
 	float BoostForce = 120000.f;
