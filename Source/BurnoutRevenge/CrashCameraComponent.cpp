@@ -1,4 +1,5 @@
 #include "CrashCameraComponent.h"
+#include "BurnoutCameraShake.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 
@@ -35,7 +36,7 @@ void UCrashCameraComponent::TriggerCrash(FVector ImpactVelocity)
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), SlowMoTimeDilation);
 
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
-		PC->ClientStartCameraShake(nullptr);
+		PC->ClientStartCameraShake(UBurnoutCameraShake::StaticClass());
 }
 
 void UCrashCameraComponent::EndCrash()

@@ -1,6 +1,8 @@
 #include "NearMissComponent.h"
 #include "BurnoutCar.h"
+#include "BurnoutGameMode.h"
 #include "TrafficVehicle.h"
+#include "Kismet/GameplayStatics.h"
 
 UNearMissComponent::UNearMissComponent()
 {
@@ -32,4 +34,7 @@ void UNearMissComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAc
 
 	LastNearMissTime = Now;
 	Car->AddBoostCharge(BoostReward);
+
+	if (ABurnoutGameMode* GM = Cast<ABurnoutGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+		GM->RegisterNearMiss();
 }
