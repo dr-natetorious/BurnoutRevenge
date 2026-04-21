@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "BurnoutCar.h"
+#include "WaypointActor.h"
 #include "AIOpponentCar.generated.h"
 
 UCLASS()
@@ -15,20 +16,19 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-	float TargetSpeed = 1800.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	float SteerStrength = 2.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-	TArray<AActor*> Waypoints;
+	float WaypointAcceptRadius = 500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	AWaypointActor* StartWaypoint = nullptr;
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	int32 CurrentWaypoint = 0;
+	AWaypointActor* CurrentWaypoint = nullptr;
 
-	void SteerTowardTarget(FVector TargetLocation, float DeltaTime);
-	AActor* GetNextWaypoint() const;
+	void SteerTowardTarget(FVector TargetLocation);
 };

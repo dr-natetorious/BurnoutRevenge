@@ -4,50 +4,40 @@
 AAIOpponentCar::AAIOpponentCar()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void AAIOpponentCar::BeginPlay()
 {
 	Super::BeginPlay();
+	CurrentWaypoint = StartWaypoint;
 }
 
 void AAIOpponentCar::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	AActor::Tick(DeltaTime);
 
-	AActor* Target = GetNextWaypoint();
-	if (!Target)
+	if (!CurrentWaypoint)
 		return;
 
-	SteerTowardTarget(Target->GetActorLocation(), DeltaTime);
+	FVector Target = CurrentWaypoint->GetActorLocation();
+	SteerTowardTarget(Target);
 
-	// Advance waypoint when close enough
-	float DistSq = FVector::DistSquared(GetActorLocation(), Target->GetActorLocation());
-	if (DistSq < 250000.f && Waypoints.Num() > 0)
-		CurrentWaypoint = (CurrentWaypoint + 1) % Waypoints.Num();
+	if (FVector::DistSquared(GetActorLocation(), Target) < WaypointAcceptRadius * WaypointAcceptRadius)
+		CurrentWaypoint = CurrentWaypoint->NextWaypoint;
 }
 
-void AAIOpponentCar::SteerTowardTarget(FVector TargetLocation, float DeltaTime)
+void AAIOpponentCar::SteerTowardTarget(FVector TargetLocation)
 {
 	UChaosVehicleMovementComponent* VM = GetVehicleMovementComponent();
 	if (!VM)
 		return;
 
 	FVector ToTarget = (TargetLocation - GetActorLocation()).GetSafeNormal();
-	FVector Forward = GetActorForwardVector();
-	FVector Right = GetActorRightVector();
-
-	float SteerDot = FVector::DotProduct(Right, ToTarget);
-	float ForwardDot = FVector::DotProduct(Forward, ToTarget);
+	float SteerDot = FVector::DotProduct(GetActorRightVector(), ToTarget);
+	float ForwardDot = FVector::DotProduct(GetActorForwardVector(), ToTarget);
 
 	VM->SetThrottleInput(ForwardDot > 0.f ? 1.f : 0.f);
 	VM->SetBrakeInput(ForwardDot < -0.3f ? 1.f : 0.f);
 	VM->SetSteeringInput(FMath::Clamp(SteerDot * SteerStrength, -1.f, 1.f));
-}
-
-AActor* AAIOpponentCar::GetNextWaypoint() const
-{
-	if (Waypoints.IsEmpty())
-		return nullptr;
-	return Waypoints[CurrentWaypoint % Waypoints.Num()];
 }
