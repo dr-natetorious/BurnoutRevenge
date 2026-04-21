@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "BurnoutGameState.h"
 #include "BurnoutHUD.generated.h"
 
 UCLASS()

@@ -1,16 +1,29 @@
 #include "BurnoutGameMode.h"
+#include "BurnoutGameState.h"
 #include "BurnoutCar.h"
+#include "BurnoutHUD.h"
+#include "Kismet/GameplayStatics.h"
 
 ABurnoutGameMode::ABurnoutGameMode()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	DefaultPawnClass = ABurnoutCar::StaticClass();
+	GameStateClass = ABurnoutGameState::StaticClass();
+	HUDClass = ABurnoutHUD::StaticClass();
 }
 
 void ABurnoutGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	TimeRemaining = RoadRageDuration;
+
+	if (ABurnoutGameState* GS = GetGameState<ABurnoutGameState>())
+	{
+		GS->TimeRemaining = RoadRageDuration;
+		GS->bGameOver = false;
+		GS->TakedownCount = 0;
+		GS->NearMissCount = 0;
+	}
+
 	bGameStarted = true;
 }
 
@@ -18,24 +31,46 @@ void ABurnoutGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!bGameStarted || bGameOver)
+	if (!bGameStarted)
+		return;
+
+	ABurnoutGameState* GS = GetGameState<ABurnoutGameState>();
+	if (!GS || GS->bGameOver)
 		return;
 
 	if (GameType == EBurnoutGameType::RoadRage)
 	{
-		TimeRemaining = FMath::Max(0.f, TimeRemaining - DeltaTime);
-		if (TimeRemaining <= 0.f)
-			bGameOver = true;
+		GS->TimeRemaining = FMath::Max(0.f, GS->TimeRemaining - DeltaTime);
+		if (GS->TimeRemaining <= 0.f)
+			EndGame();
 	}
 }
 
 void ABurnoutGameMode::RegisterTakedown()
 {
-	TakedownCount++;
+	if (ABurnoutGameState* GS = GetGameState<ABurnoutGameState>())
+		GS->TakedownCount++;
+}
+
+void ABurnoutGameMode::RegisterNearMiss()
+{
+	if (ABurnoutGameState* GS = GetGameState<ABurnoutGameState>())
+		GS->NearMissCount++;
 }
 
 void ABurnoutGameMode::RegisterLapComplete(int32 CurrentLap)
 {
 	if (GameType == EBurnoutGameType::Race && CurrentLap >= TotalLaps)
-		bGameOver = true;
+		EndGame();
+}
+
+void ABurnoutGameMode::EndGame()
+{
+	if (ABurnoutGameState* GS = GetGameState<ABurnoutGameState>())
+		GS->bGameOver = true;
+}
+
+void ABurnoutGameMode::RestartGame()
+{
+	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), true);
 }

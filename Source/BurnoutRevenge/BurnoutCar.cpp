@@ -1,8 +1,10 @@
 #include "BurnoutCar.h"
+#include "BurnoutGameMode.h"
 #include "CrashCameraComponent.h"
 #include "NearMissComponent.h"
 #include "ChaosVehicleMovementComponent.h"
 #include "Components/InputComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ABurnoutCar::ABurnoutCar()
 {
@@ -44,6 +46,7 @@ void ABurnoutCar::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	Super::SetupPlayerInputComponent(InputComponent);
 	InputComponent->BindAction("Boost", IE_Pressed, this, &ABurnoutCar::OnBoostPressed);
 	InputComponent->BindAction("Boost", IE_Released, this, &ABurnoutCar::OnBoostReleased);
+	InputComponent->BindAction("RestartGame", IE_Pressed, this, &ABurnoutCar::OnRestartPressed);
 }
 
 void ABurnoutCar::AddBoostCharge(float Amount)
@@ -60,4 +63,10 @@ void ABurnoutCar::OnBoostPressed()
 void ABurnoutCar::OnBoostReleased()
 {
 	bIsBoosting = false;
+}
+
+void ABurnoutCar::OnRestartPressed()
+{
+	if (ABurnoutGameMode* GM = Cast<ABurnoutGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+		GM->RestartGame();
 }

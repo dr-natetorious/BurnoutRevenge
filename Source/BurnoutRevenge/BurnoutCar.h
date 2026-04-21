@@ -53,4 +53,5 @@ protected:
 private:
 	void OnBoostPressed();
 	void OnBoostReleased();
+	void OnRestartPressed();
 };

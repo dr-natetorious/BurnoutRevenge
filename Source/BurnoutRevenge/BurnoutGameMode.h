@@ -31,21 +31,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
 	int32 TotalLaps = 3;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Game")
-	int32 TakedownCount = 0;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Game")
-	float TimeRemaining = 0.f;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Game")
-	bool bGameOver = false;
-
 	UFUNCTION(BlueprintCallable, Category = "Game")
 	void RegisterTakedown();
 
 	UFUNCTION(BlueprintCallable, Category = "Game")
+	void RegisterNearMiss();
+
+	UFUNCTION(BlueprintCallable, Category = "Game")
 	void RegisterLapComplete(int32 CurrentLap);
+
+	UFUNCTION(BlueprintCallable, Category = "Game")
+	void RestartGame();
 
 private:
 	bool bGameStarted = false;
+	void EndGame();
 };
