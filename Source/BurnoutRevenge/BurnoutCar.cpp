@@ -18,7 +18,7 @@ ABurnoutCar::ABurnoutCar()
 void ABurnoutCar::BeginPlay()
 {
 	Super::BeginPlay();
-	BoostCharge = 0.f;
+	BoostCharge = BoostMaxCharge * 0.3f;
 }
 
 void ABurnoutCar::Tick(float DeltaTime)

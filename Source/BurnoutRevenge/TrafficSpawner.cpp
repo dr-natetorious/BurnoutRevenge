@@ -28,26 +28,30 @@ void ATrafficSpawner::Tick(float DeltaTime)
 	if (Existing.Num() >= MaxTrafficCount)
 		return;
 
-	SpawnTrafficVehicle();
+	SpawnTrafficVehicle(true);   // oncoming
+	SpawnTrafficVehicle(false);  // same direction
 }
 
-void ATrafficSpawner::SpawnTrafficVehicle()
+void ATrafficSpawner::SpawnTrafficVehicle(bool bOncoming)
 {
 	APawn* Player = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!Player || !TrafficClass)
 		return;
 
-	// Spawn ahead of player in oncoming lane
 	FVector Forward = Player->GetActorForwardVector();
 	FVector Right = Player->GetActorRightVector();
-	FVector SpawnPos = Player->GetActorLocation()
-		+ Forward * SpawnAheadDistance
-		- Right * LaneWidth;  // oncoming lane
 
-	FRotator SpawnRot = (-Forward).Rotation();  // facing player
+	float AheadDist = bOncoming ? SpawnAheadDistance : -SpawnAheadDistance * 0.5f;
+	float LaneSide = bOncoming ? -LaneWidth : LaneWidth;
+
+	FVector SpawnPos = Player->GetActorLocation()
+		+ Forward * AheadDist
+		+ Right * LaneSide;
+	SpawnPos.Z += 100.f;
+
+	FRotator SpawnRot = bOncoming ? (-Forward).Rotation() : Forward.Rotation();
 
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
 	GetWorld()->SpawnActor<AActor>(TrafficClass, SpawnPos, SpawnRot, Params);
 }

@@ -35,5 +35,5 @@ protected:
 private:
 	float SpawnTimer = 0.f;
 
-	void SpawnTrafficVehicle();
+	void SpawnTrafficVehicle(bool bOncoming);
 };
