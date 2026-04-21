@@ -13,7 +13,9 @@ public class BurnoutRevenge : ModuleRules
 			"Engine",
 			"InputCore",
 			"ChaosVehicles",
-			"PhysicsCore"
+			"PhysicsCore",
+			"RHI",
+			"RenderCore"
 		});
 	}
 }
