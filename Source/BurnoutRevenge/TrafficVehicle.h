@@ -24,7 +24,7 @@ public:
 	bool bWrecked = false;
 
 	UFUNCTION(BlueprintCallable, Category = "Traffic")
-	void Wreck(AActor* Attacker);
+	void Wreck(AActor* Attacker, float ForceMultiplier = 1.f);
 
 protected:
 	virtual void BeginPlay() override;
